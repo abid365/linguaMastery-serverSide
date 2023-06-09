@@ -4,6 +4,8 @@ const cors = require("cors");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 
+// middlewares
+
 app.use(cors());
 app.use(express.json());
 
@@ -25,6 +27,16 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const instructorCollection = client
+      .db("SummerSchool")
+      .collection("Instructors");
+
+    app.get("/inst", async (req, res) => {
+      const instructors = await instructorCollection.find().toArray();
+      res.send(instructors);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(

@@ -11,7 +11,7 @@ app.use(express.json());
 
 // mongodb
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_user}:${process.env.DB_pass}@cluster0.arpztf9.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -32,9 +32,45 @@ async function run() {
       .db("SummerSchool")
       .collection("Instructors");
 
+    const selectedClassCollection = client
+      .db("SummerSchool")
+      .collection("selectedClass");
+
+    // api for all
     app.get("/inst", async (req, res) => {
       const instructors = await instructorCollection.find().toArray();
       res.send(instructors);
+    });
+
+    // getting loader api
+    app.get("/inst/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: new ObjectId(id) };
+      const options = {
+        projection: {
+          course_price: 1,
+          teacher: 1,
+          available_seats: 1,
+          enrolled_students: 1,
+          image_url: 1,
+          title: 1,
+          description: 1,
+          course_img: 1,
+          _id: 1,
+        },
+      };
+      const result = await instructorCollection.findOne(query, options);
+      res.send(result);
+    });
+
+    // post for selected classs / my selected class
+    app.post("/myclass/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await selectedClassCollection.insertOne(query);
+      res.send(result);
+      console.log(result);
     });
 
     // Send a ping to confirm a successful connection

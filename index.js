@@ -42,7 +42,18 @@ async function run() {
       res.send(instructors);
     });
 
-    // getting loader api
+    // api for selected classes by user
+    app.get("/myclass", async (req, res) => {
+      console.log(req.query.user);
+      let query = {};
+      if (req.query?.user) {
+        query = { user: req.query?.user };
+        const userClass = await selectedClassCollection.find(query).toArray();
+        res.send(userClass);
+      }
+    });
+
+    // getting data by id / loader api
     app.get("/inst/:id", async (req, res) => {
       const id = req.params.id;
       console.log(id);

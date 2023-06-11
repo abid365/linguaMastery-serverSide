@@ -65,12 +65,12 @@ async function run() {
     });
 
     // post for selected classs / my selected class
-    app.post("/myclass/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await selectedClassCollection.insertOne(query);
+    app.post("/myclass", async (req, res) => {
+      const selected = req.body;
+      const result = await selectedClassCollection.insertOne(selected);
       res.send(result);
       console.log(result);
+      // console.log(selected);
     });
 
     // Send a ping to confirm a successful connection

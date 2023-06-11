@@ -53,6 +53,14 @@ async function run() {
       }
     });
 
+    // delete class by id from myclass route
+    app.delete("/myclass/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await selectedClassCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // getting data by id / loader api
     app.get("/inst/:id", async (req, res) => {
       const id = req.params.id;

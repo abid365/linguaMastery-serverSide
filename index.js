@@ -42,10 +42,21 @@ async function run() {
       .db("SummerSchool")
       .collection("selectedClass");
 
+    const userCollection = client
+      .db("SummerSchool")
+      .collection("userCollection");
+
     // api for all
     app.get("/inst", async (req, res) => {
       const instructors = await instructorCollection.find().toArray();
       res.send(instructors);
+    });
+
+    // api for users
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.send(result);
     });
 
     // api for selected classes by user

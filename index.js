@@ -1,12 +1,18 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+/* const corsConfig = {
+  origin: "",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+}; */
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 
 // middlewares
 
 app.use(cors());
+// app.options("", cors(corsConfig));
 app.use(express.json());
 
 // mongodb
@@ -26,7 +32,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    client.connect();
 
     const instructorCollection = client
       .db("SummerSchool")

@@ -14,11 +14,13 @@ app.use(express.json());
 const verifyJWT = (req, res, next) => {
   const authorization = req.headers.authorization;
   if (!authorization) {
-    res.status(401).send({ error: true, message: "unauthorizes access" });
+    return res
+      .status(401)
+      .send({ error: true, message: "unauthorized access" });
   }
-
   // bearer token
   const token = authorization.split(" ")[1];
+
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
       return res
@@ -72,7 +74,12 @@ async function run() {
 
     // api for all
     app.get("/inst", async (req, res) => {
-      const instructors = await instructorCollection.find().toArray();
+      const instructors = await instructorCollection
+        .find()
+        .sort({
+          enrolled_students: 1,
+        })
+        .toArray();
       res.send(instructors);
     });
 
@@ -103,10 +110,35 @@ async function run() {
       res.send(result);
     });
 
+    // for detecting admin
+    app.get("/users/admin/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+
+      if (req.decoded.email !== email) {
+        res.send({ admin: false });
+      }
+
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      const result = { admin: user?.role === "admin" };
+      res.send(result);
+    });
+
+    // for showing users in admin dashboard
     app.get("/users", async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
+
+    // deleting user from admin dashboard
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await userCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // preventing users to be added twice and sending to db from google signin
 
     app.post("/users", async (req, res) => {
       const user = req.body;

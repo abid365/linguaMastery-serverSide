@@ -83,6 +83,13 @@ async function run() {
       res.send(instructors);
     });
 
+    // post data for instructor
+    app.post("/inst", async (req, res) => {
+      const user = req.body;
+      const result = await instructorCollection.insertOne(user);
+      res.send(result);
+    });
+
     // api for users
     app.patch("/users/admin/:id", async (req, res) => {
       const id = req.params.id;

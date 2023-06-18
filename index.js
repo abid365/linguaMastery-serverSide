@@ -84,6 +84,17 @@ async function run() {
       res.send(instructors);
     });
 
+    // getiiing instructors pending classes by email and pending query
+    app.get("/inst/pending", async (req, res) => {
+      console.log(req.query.email);
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email };
+      }
+      const result = await instructorCollection.find(query).toArray();
+      res.send(result);
+    });
+
     // post data for instructor
     app.post("/inst", async (req, res) => {
       const user = req.body;
